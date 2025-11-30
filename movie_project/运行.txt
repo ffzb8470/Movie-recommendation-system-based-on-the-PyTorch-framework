@@ -1,0 +1,9 @@
+进入虚拟环境：
+.\.venv\Scripts\Activate.ps1
+开始训练：
+python main.py --mode train
+评估模型：
+python main.py --mode eval
+生成推荐：
+# 为用户ID=1生成Top-10推荐
+python main.py --mode recommend --user-id 1 --top-n 10
