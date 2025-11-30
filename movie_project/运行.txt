@@ -1,5 +1,3 @@
-进入虚拟环境：
-.\.venv\Scripts\Activate.ps1
 开始训练：
 python main.py --mode train
 评估模型：
