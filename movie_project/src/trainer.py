@@ -99,6 +99,9 @@ class Trainer:
             user_stats = batch.get('user_stats', None)
             if user_stats is not None:
                 user_stats = user_stats.to(self.device, non_blocking=True)
+            user_features = batch.get('user_features', None)
+            if user_features is not None:
+                user_features = user_features.to(self.device, non_blocking=True)
             
             # 前向传播
             self.optimizer.zero_grad()
@@ -108,6 +111,8 @@ class Trainer:
                 kwargs['genres'] = genres
             if user_stats is not None:
                 kwargs['user_stats'] = user_stats
+            if user_features is not None:
+                kwargs['user_features'] = user_features
             
             if self.loss_type == 'bpr' and self.n_movies:
                 neg_movie = self._sample_negatives(movie)
@@ -146,12 +151,17 @@ class Trainer:
                 user_stats = batch.get('user_stats', None)
                 if user_stats is not None:
                     user_stats = user_stats.to(self.device, non_blocking=True)
+                user_features = batch.get('user_features', None)
+                if user_features is not None:
+                    user_features = user_features.to(self.device, non_blocking=True)
                 
                 kwargs = {}
                 if genres is not None:
                     kwargs['genres'] = genres
                 if user_stats is not None:
                     kwargs['user_stats'] = user_stats
+                if user_features is not None:
+                    kwargs['user_features'] = user_features
                 
                 predictions = self.model(user, movie, **kwargs)
                 loss = self.criterion(predictions, rating)
@@ -192,7 +202,7 @@ class Trainer:
                 self.best_val_loss = val_loss
                 self.early_stop_counter = 0
                 self.save_checkpoint(epoch, is_best=True)
-                print("  → 最佳模型已保存")
+                print("   最佳模型已保存")
             else:
                 self.early_stop_counter += 1
                 if self.early_stop_counter >= self.config.patience:
@@ -238,4 +248,4 @@ class Trainer:
         plt.legend(fontsize=12)
         plt.grid(True, alpha=0.3)
         plt.savefig(save_path, dpi=300, bbox_inches='tight')
-        plt.show()
+        plt.close()  # 关闭图形，避免弹窗阻塞

@@ -102,12 +102,17 @@ class Evaluator:
                 user_stats = batch.get('user_stats', None)
                 if user_stats is not None:
                     user_stats = user_stats.to(self.device, non_blocking=True)
+                user_features = batch.get('user_features', None)
+                if user_features is not None:
+                    user_features = user_features.to(self.device, non_blocking=True)
                 
                 kwargs = {}
                 if genres is not None:
                     kwargs['genres'] = genres
                 if user_stats is not None:
                     kwargs['user_stats'] = user_stats
+                if user_features is not None:
+                    kwargs['user_features'] = user_features
                 
                 predictions = self.model(user, movie, **kwargs)
                 
@@ -145,7 +150,7 @@ class Evaluator:
     
     def evaluate(self, save_path: str = "evaluation_results.json"):
         """执行评估并保存结果"""
-        print("\n📊 开始评估测试集...")
+        print("\n 开始评估测试集...")
         metrics = self.compute_metrics()
         
         print("\n" + "="*40)
@@ -163,5 +168,5 @@ class Evaluator:
             json.dump({k: v for k, v in metrics.items() if k not in ['predictions', 'ground_truth']}, 
                      f, indent=2)
         
-        print(f"\n✅ 评估结果已保存至: {save_path}")
+        print(f"\n 评估结果已保存至: {save_path}")
         return metrics

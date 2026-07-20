@@ -15,6 +15,7 @@ from src.trainer import Trainer
 from src.evaluator import Evaluator
 from src.inference import InferenceEngine
 from src.utils import set_seed
+from src.chinese_titles import get_chinese_title
 
 
 def setup_logger():
@@ -78,7 +79,7 @@ def train(config, logger):
     logger.info(f"筛选后 - 用户: {stats['n_users']}人, 电影: {stats['n_movies']}部, 评分: {len(ratings)}条")
     logger.info(f"数据集划分: 训练集: {len(loaders['train'].dataset)}条, 验证集: {len(loaders['val'].dataset)}条, 测试集: {len(loaders['test'].dataset)}条")
     
-    # 模型初始化（含特征增强）
+    # 模型初始化（DeepFM）
     model = NCF(
         n_users=stats['n_users'],
         n_movies=stats['n_movies'],
@@ -87,8 +88,6 @@ def train(config, logger):
         dropout=config.model.dropout,
         n_genres=extra_info['n_genres'],
         n_user_stats=extra_info['n_user_stats'],
-        use_genres=config.model.use_genres,
-        use_user_stats=config.model.use_user_stats
     )
     
     logger.info(f"模型创建完成，参数量: {sum(p.numel() for p in model.parameters()):,}")
@@ -142,7 +141,7 @@ def evaluate(config, logger):
     train_config = checkpoint['config'] if isinstance(checkpoint['config'], Config) else config
     
     # 数据准备
-    movies, ratings, loaders, stats, _ = prepare_data(train_config)
+    movies, ratings, loaders, stats, _, extra_info = prepare_data(train_config)
     logger.info(f"数据加载完成 - 用户: {stats['n_users']}人, 电影: {stats['n_movies']}部, 测试集: {len(loaders['test'].dataset)}条")
     
     # 提取模型配置（兼容Trainer保存的config结构）
@@ -212,7 +211,9 @@ def recommend(config, logger, user_id: int, top_n: int):
         print("="*60)
         
         for i, rec in enumerate(recs, 1):
-            print(f"{i:2d}. {rec['title']:40s}")
+            cn_title = get_chinese_title(rec['title'])
+            print(f"{i:2d}. {cn_title:30s}")
+            print(f"    英文名: {rec['title']}")
             print(f"    类型: {rec.get('genres', '未知')}")
             print(f"    预测评分: {rec['predicted_rating']:.2f}")
             print()

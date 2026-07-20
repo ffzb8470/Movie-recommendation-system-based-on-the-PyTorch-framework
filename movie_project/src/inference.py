@@ -63,13 +63,15 @@ class InferenceEngine:
                     "2. 训练时将stats保存到checkpoint中"
                 ) from e
         
-        # 初始化并加载模型
+        # 初始化并加载模型（DeepFM）
         model = NCF(
             n_users=n_users,
             n_movies=n_movies,
             embedding_dim=model_config.embedding_dim,
             hidden_dims=model_config.hidden_dims,
-            dropout=model_config.dropout
+            dropout=model_config.dropout,
+            n_genres=getattr(model_config, 'n_genres', 18),
+            n_user_stats=getattr(model_config, 'n_user_stats', 3),
         )
         model.load_state_dict(checkpoint['model_state_dict'])
         model.to(self.device)
