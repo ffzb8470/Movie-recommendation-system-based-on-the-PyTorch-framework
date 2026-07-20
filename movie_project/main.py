@@ -43,6 +43,7 @@ def parse_args():
                        help="运行模式: train/eval/recommend")
     parser.add_argument("--user-id", type=int, help="推荐模式下的用户ID")
     parser.add_argument("--top-n", type=int, default=10, help="推荐数量")
+    parser.add_argument("--loss-type", type=str, default="mse", choices=["mse", "bpr"], help="损失函数类型")
     return parser.parse_args()
 
 
@@ -53,6 +54,7 @@ def main():
     
     # 初始化配置（完整的Config总对象）
     config = Config()
+    config.training.loss_type = args.loss_type
     
     # 模式选择
     if args.mode == "train":
@@ -88,7 +90,7 @@ def train(config, logger):
     logger.info(f"模型创建完成，参数量: {sum(p.numel() for p in model.parameters()):,}")
     
     # 训练（Trainer会自动保存模型，无需手动保存）
-    trainer = Trainer(model, loaders['train'], loaders['val'], config.training)
+    trainer = Trainer(model, loaders['train'], loaders['val'], config.training, n_movies=stats['n_movies'])
     history = trainer.train()
     
     # 绘制训练曲线

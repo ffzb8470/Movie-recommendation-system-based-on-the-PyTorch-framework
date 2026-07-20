@@ -16,7 +16,7 @@ class ModelConfig:
     """模型配置"""
     embedding_dim: int = 64
     hidden_dims: List[int] = None
-    dropout: float = 0.3
+    dropout: float = 0.5
     
     def __post_init__(self):
         if self.hidden_dims is None:
@@ -31,6 +31,7 @@ class TrainingConfig:
     weight_decay: float = 1e-5
     patience: int = 10
     device: str = "auto"  # auto, cpu, cuda
+    loss_type: str = "mse"  # mse 或 bpr
     
     def __post_init__(self):
         if self.device == "auto":

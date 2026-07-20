@@ -3,16 +3,19 @@ from torch import nn
 from pathlib import Path
 from tqdm import tqdm
 import matplotlib.pyplot as plt
+from torch.optim.lr_scheduler import LinearLR, SequentialLR, ReduceLROnPlateau
 
 class Trainer:
     """训练管理器"""
-    def __init__(self, model, train_loader, val_loader, config):
+    def __init__(self, model, train_loader, val_loader, config, n_movies=None):
         self.model = model
         self.train_loader = train_loader
         self.val_loader = val_loader
         self.config = config
+        self.n_movies = n_movies  # BPR loss 负采样需要
         
         # 损失函数
+        self.loss_type = config.loss_type
         self.criterion = nn.MSELoss()
         
         # 优化器
@@ -23,12 +26,31 @@ class Trainer:
         )
         
         # 学习率调度
-        self.scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
-            self.optimizer,
-            mode='min',
-            factor=0.5,
-            patience=5,
-        )
+        self.warmup_epochs = 5
+        if self.warmup_epochs > 0:
+            warmup_scheduler = LinearLR(
+                self.optimizer,
+                start_factor=1e-3,
+                end_factor=1.0,
+                total_iters=self.warmup_epochs
+            )
+            main_scheduler = ReduceLROnPlateau(
+                self.optimizer,
+                mode='min',
+                factor=0.5,
+                patience=5,
+            )
+            self.scheduler = main_scheduler
+            self.use_warmup = True
+        else:
+            self.scheduler = ReduceLROnPlateau(
+                self.optimizer,
+                mode='min',
+                factor=0.5,
+                patience=5,
+            )
+            self.use_warmup = False
+        self.warmup_scheduler = warmup_scheduler if self.warmup_epochs > 0 else None
         
         # 设备
         self.device = config.device
@@ -46,6 +68,20 @@ class Trainer:
         self.save_dir = Path("models")
         self.save_dir.mkdir(exist_ok=True)
     
+    def _bpr_loss(self, user, pos_movie, neg_movie):
+        """BPR (Bayesian Personalized Ranking) 损失"""
+        pos_score = self.model(user, pos_movie)
+        neg_score = self.model(user, neg_movie)
+        # BPR loss: -log(sigmoid(pos - neg))
+        diff = pos_score - neg_score
+        loss = -torch.log(torch.sigmoid(diff) + 1e-10)
+        return loss.mean()
+    
+    def _sample_negatives(self, pos_movie):
+        """为 BPR 随机采样负样本"""
+        neg_movie = torch.randint(1, self.n_movies, pos_movie.shape, device=self.device)
+        return neg_movie
+
     def train_epoch(self) -> float:
         """训练一个epoch"""
         self.model.train()
@@ -60,8 +96,13 @@ class Trainer:
             
             # 前向传播
             self.optimizer.zero_grad()
-            predictions = self.model(user, movie)
-            loss = self.criterion(predictions, rating)
+            
+            if self.loss_type == 'bpr' and self.n_movies:
+                neg_movie = self._sample_negatives(movie)
+                loss = self._bpr_loss(user, movie, neg_movie)
+            else:
+                predictions = self.model(user, movie)
+                loss = self.criterion(predictions, rating)
             
             # 反向传播
             loss.backward()
@@ -111,7 +152,10 @@ class Trainer:
             self.val_losses.append(val_loss)
             
             # 更新学习率
-            self.scheduler.step(val_loss)
+            if self.use_warmup and epoch < self.warmup_epochs:
+                self.warmup_scheduler.step()
+            else:
+                self.scheduler.step(val_loss)
             
             # 打印日志
             print(f"Epoch [{epoch+1:02d}/{self.config.epochs}] | "
