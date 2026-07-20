@@ -1,0 +1,17 @@
+# Python 缓存
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# 模型文件（训练生成）
+*.pth
+
+# 日志
+logs/
+
+# 训练过程生成图
+training_curve.png
+
+# 系统文件
+.DS_Store
