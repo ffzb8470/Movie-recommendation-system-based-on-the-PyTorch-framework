@@ -147,7 +147,8 @@ class DeepFM(nn.Module):
         deep_output = self.mlp(deep_input).squeeze()
         
         # ─── Combine FM + Deep ───
-        return fm_output + deep_output
+        rating = fm_output + deep_output
+        return torch.sigmoid(rating) * 4 + 1
 
 
 # 向后兼容
