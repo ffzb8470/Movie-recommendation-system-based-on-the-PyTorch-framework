@@ -67,37 +67,37 @@ python main.py --mode recommend --user-id 4169 --top-n 10
 
 ## 推荐示例
 
-### 示例1: 年轻女性用户 (userId=18, 年龄18岁, 历史均分3.65)
+### 示例1: 用户10 (喜欢歌舞/爱情/奇幻片, 不喜欢犯罪/黑色电影)
 
 | 排名 | 电影 | 类型 | 预测评分 |
 |------|------|------|---------|
-| 1 | The Godfather (1972) | Action, Crime, Drama | 4.14 |
-| 2 | The Shawshank Redemption (1994) | Drama | 4.06 |
-| 3 | A Close Shave (1995) | Animation, Comedy, Thriller | 3.95 |
-| 4 | The Wrong Trousers (1993) | Animation, Comedy | 3.90 |
-| 5 | The Matrix (1999) | Action, Sci-Fi, Thriller | 3.79 |
-| 6 | Monty Python and the Holy Grail (1974) | Comedy | 3.75 |
-| 7 | Wallace & Gromit: Aardman Animation (1996) | Animation | 3.73 |
-| 8 | Rear Window (1954) | Mystery, Thriller | 3.68 |
-| 9 | The Palm Beach Story (1942) | Comedy | 3.65 |
-| 10 | North by Northwest (1959) | Drama, Thriller | 3.65 |
+| 1 | Jumpin' Jack Flash (1986) | Action, Comedy, Romance, Thriller | 4.16 |
+| 2 | Swing Kids (1993) | Drama, War | 3.99 |
+| 3 | Where the Heart Is (2000) | Comedy, Drama | 3.95 |
+| 4 | Home Alone 3 (1997) | Children's, Comedy | 3.95 |
+| 5 | Cutthroat Island (1995) | Action, Adventure, Romance | 3.94 |
+| 6 | Armageddon (1998) | Action, Adventure, Sci-Fi, Thriller | 3.91 |
+| 7 | The Other Sister (1999) | Comedy, Drama, Romance | 3.90 |
+| 8 | Dracula: Dead and Loving It (1995) | Comedy, Horror | 3.89 |
+| 9 | The Three Musketeers (1993) | Action, Adventure, Comedy | 3.87 |
+| 10 | The Spitfire Grill (1996) | Drama | 3.86 |
 
-### 示例2: 年长男性用户 (userId=2, 年龄56岁, 历史均分3.71)
+### 示例2: 用户300 (喜欢黑色电影/战争/恐怖片, 不喜欢科幻/奇幻片)
 
 | 排名 | 电影 | 类型 | 预测评分 |
 |------|------|------|---------|
-| 1 | The Sixth Sense (1999) | Thriller | 3.68 |
-| 2 | A Close Shave (1995) | Animation, Comedy, Thriller | 3.47 |
-| 3 | Star Wars: Episode IV - A New Hope (1977) | Action, Adventure, Fantasy, Sci-Fi | 3.44 |
-| 4 | Toy Story (1995) | Animation, Children's, Comedy | 3.38 |
-| 5 | The Princess Bride (1987) | Action, Adventure, Comedy, Romance | 3.38 |
-| 6 | The Wrong Trousers (1993) | Animation, Comedy | 3.37 |
-| 7 | It's a Wonderful Life (1946) | Drama | 3.32 |
-| 8 | Toy Story 2 (1999) | Animation, Children's, Comedy | 3.32 |
-| 9 | Life Is Beautiful (1997) | Comedy, Drama | 3.31 |
-| 10 | Indiana Jones and the Last Crusade (1989) | Action, Adventure | 3.31 |
+| 1 | Star Wars: Episode IV - A New Hope (1977) | Action, Adventure, Fantasy, Sci-Fi | 3.73 |
+| 2 | The Matrix (1999) | Action, Sci-Fi, Thriller | 3.70 |
+| 3 | A Close Shave (1995) | Animation, Comedy, Thriller | 3.49 |
+| 4 | The Wrong Trousers (1993) | Animation, Comedy | 3.46 |
+| 5 | The Green Mile (1999) | Drama, Thriller | 3.44 |
+| 6 | The Usual Suspects (1995) | Crime, Thriller | 3.41 |
+| 7 | Forrest Gump (1994) | Comedy, Romance, War | 3.40 |
+| 8 | Men in Black (1997) | Action, Adventure, Comedy, Sci-Fi | 3.32 |
+| 9 | Young Frankenstein (1974) | Comedy, Horror | 3.32 |
+| 10 | Schindler's List (1993) | Drama, War | 3.32 |
 
-两个用户的推荐结果差异体现了模型对用户画像的区分能力: 年轻女性用户偏向经典犯罪剧情片, 年长男性用户偏向合家欢和科幻冒险片。预测评分接近用户历史均分, 符合实际评分习惯。
+两个用户的推荐结果体现了模型对用户画像的区分能力: 用户10偏好浪漫喜剧和剧情片, 用户300偏向动作科幻和犯罪惊悚片, 差异明显。
 
 ## 依赖
 
