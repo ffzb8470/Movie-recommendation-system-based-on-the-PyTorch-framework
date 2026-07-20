@@ -35,7 +35,20 @@ class Evaluator:
                 user = batch['user'].to(self.device, non_blocking=True)
                 movie = batch['movie'].to(self.device, non_blocking=True)
                 rating = batch['rating'].to(self.device, non_blocking=True)
-                predictions = self.model(user, movie)
+                genres = batch.get('genres', None)
+                if genres is not None:
+                    genres = genres.to(self.device, non_blocking=True)
+                user_stats = batch.get('user_stats', None)
+                if user_stats is not None:
+                    user_stats = user_stats.to(self.device, non_blocking=True)
+                
+                kwargs = {}
+                if genres is not None:
+                    kwargs['genres'] = genres
+                if user_stats is not None:
+                    kwargs['user_stats'] = user_stats
+                
+                predictions = self.model(user, movie, **kwargs)
                 
                 for u, p, r in zip(user.cpu().numpy(), predictions.cpu().numpy(), rating.cpu().numpy()):
                     user_preds[int(u)].append(float(p))
@@ -83,8 +96,20 @@ class Evaluator:
                 user = batch['user'].to(self.device, non_blocking=True)
                 movie = batch['movie'].to(self.device, non_blocking=True)
                 rating = batch['rating'].to(self.device, non_blocking=True)
+                genres = batch.get('genres', None)
+                if genres is not None:
+                    genres = genres.to(self.device, non_blocking=True)
+                user_stats = batch.get('user_stats', None)
+                if user_stats is not None:
+                    user_stats = user_stats.to(self.device, non_blocking=True)
                 
-                predictions = self.model(user, movie)
+                kwargs = {}
+                if genres is not None:
+                    kwargs['genres'] = genres
+                if user_stats is not None:
+                    kwargs['user_stats'] = user_stats
+                
+                predictions = self.model(user, movie, **kwargs)
                 
                 all_preds.extend(predictions.cpu().numpy())
                 all_true.extend(rating.cpu().numpy())

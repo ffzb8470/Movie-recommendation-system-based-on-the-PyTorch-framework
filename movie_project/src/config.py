@@ -17,6 +17,9 @@ class ModelConfig:
     embedding_dim: int = 64
     hidden_dims: List[int] = None
     dropout: float = 0.5
+    n_genres: int = 20  # 电影类型数
+    use_genres: bool = True  # 是否使用类型特征
+    use_user_stats: bool = True  # 是否使用用户统计特征
     
     def __post_init__(self):
         if self.hidden_dims is None:

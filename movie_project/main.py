@@ -72,19 +72,23 @@ def train(config, logger):
     """训练模式"""
     logger.info("开始训练流程")
     
-    # 数据准备
-    movies, ratings, loaders, stats, preprocessor = prepare_data(config)
+    # 数据准备（含特征工程）
+    movies, ratings, loaders, stats, preprocessor, extra_info = prepare_data(config)
     logger.info(f"原始数据 - 电影: {stats['n_movies']}部, 评分: {len(ratings)}条")
     logger.info(f"筛选后 - 用户: {stats['n_users']}人, 电影: {stats['n_movies']}部, 评分: {len(ratings)}条")
     logger.info(f"数据集划分: 训练集: {len(loaders['train'].dataset)}条, 验证集: {len(loaders['val'].dataset)}条, 测试集: {len(loaders['test'].dataset)}条")
     
-    # 模型初始化
+    # 模型初始化（含特征增强）
     model = NCF(
         n_users=stats['n_users'],
         n_movies=stats['n_movies'],
         embedding_dim=config.model.embedding_dim,
         hidden_dims=config.model.hidden_dims,
-        dropout=config.model.dropout
+        dropout=config.model.dropout,
+        n_genres=extra_info['n_genres'],
+        n_user_stats=extra_info['n_user_stats'],
+        use_genres=config.model.use_genres,
+        use_user_stats=config.model.use_user_stats
     )
     
     logger.info(f"模型创建完成，参数量: {sum(p.numel() for p in model.parameters()):,}")

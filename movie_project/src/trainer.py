@@ -93,15 +93,27 @@ class Trainer:
             user = batch['user'].to(self.device, non_blocking=True)
             movie = batch['movie'].to(self.device, non_blocking=True)
             rating = batch['rating'].to(self.device, non_blocking=True)
+            genres = batch.get('genres', None)
+            if genres is not None:
+                genres = genres.to(self.device, non_blocking=True)
+            user_stats = batch.get('user_stats', None)
+            if user_stats is not None:
+                user_stats = user_stats.to(self.device, non_blocking=True)
             
             # 前向传播
             self.optimizer.zero_grad()
             
+            kwargs = {}
+            if genres is not None:
+                kwargs['genres'] = genres
+            if user_stats is not None:
+                kwargs['user_stats'] = user_stats
+            
             if self.loss_type == 'bpr' and self.n_movies:
                 neg_movie = self._sample_negatives(movie)
-                loss = self._bpr_loss(user, movie, neg_movie)
+                loss = self._bpr_loss(user, neg_movie, movie, **kwargs)
             else:
-                predictions = self.model(user, movie)
+                predictions = self.model(user, movie, **kwargs)
                 loss = self.criterion(predictions, rating)
             
             # 反向传播
@@ -128,8 +140,20 @@ class Trainer:
                 user = batch['user'].to(self.device, non_blocking=True)
                 movie = batch['movie'].to(self.device, non_blocking=True)
                 rating = batch['rating'].to(self.device, non_blocking=True)
+                genres = batch.get('genres', None)
+                if genres is not None:
+                    genres = genres.to(self.device, non_blocking=True)
+                user_stats = batch.get('user_stats', None)
+                if user_stats is not None:
+                    user_stats = user_stats.to(self.device, non_blocking=True)
                 
-                predictions = self.model(user, movie)
+                kwargs = {}
+                if genres is not None:
+                    kwargs['genres'] = genres
+                if user_stats is not None:
+                    kwargs['user_stats'] = user_stats
+                
+                predictions = self.model(user, movie, **kwargs)
                 loss = self.criterion(predictions, rating)
                 
                 total_loss += loss.item() * len(user)
