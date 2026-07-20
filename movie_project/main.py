@@ -15,7 +15,6 @@ from src.trainer import Trainer
 from src.evaluator import Evaluator
 from src.inference import InferenceEngine
 from src.utils import set_seed
-from src.chinese_titles import get_chinese_title
 
 
 def setup_logger():
@@ -211,9 +210,7 @@ def recommend(config, logger, user_id: int, top_n: int):
         print("="*60)
         
         for i, rec in enumerate(recs, 1):
-            cn_title = get_chinese_title(rec['title'])
-            print(f"{i:2d}. {cn_title:30s}")
-            print(f"    英文名: {rec['title']}")
+            print(f"{i:2d}. {rec['title']:40s}")
             print(f"    类型: {rec.get('genres', '未知')}")
             print(f"    预测评分: {rec['predicted_rating']:.2f}")
             print()
