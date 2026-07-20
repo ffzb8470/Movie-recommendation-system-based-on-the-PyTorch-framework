@@ -13,5 +13,11 @@ logs/
 # 训练过程生成图
 training_curve.png
 
+# 评估结果（训练生成）
+evaluation_results.json
+
+# 空文件/无用文件
+pip
+
 # 系统文件
 .DS_Store

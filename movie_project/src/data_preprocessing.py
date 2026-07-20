@@ -91,14 +91,17 @@ class DataPreprocessor:
     
     def create_dataloaders(self, data_dict: dict, batch_size: int) -> dict:
         """创建DataLoader"""
+        import os
         dataloaders = {}
+        # Windows 下 num_workers>0 可能引发多进程问题，自动适配
+        num_workers = 0 if os.name == 'nt' else 2
         
         for split, df in data_dict.items():
             dataset = MovieRatingDataset(df['user'], df['movie'], df['rating'])
             shuffle = (split == 'train')
             dataloaders[split] = DataLoader(
                 dataset, batch_size=batch_size, 
-                shuffle=shuffle, num_workers=2, pin_memory=True
+                shuffle=shuffle, num_workers=num_workers, pin_memory=True
             )
         
         return dataloaders
